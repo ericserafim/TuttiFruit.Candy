@@ -3,11 +3,9 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TuttiFruit.Candy.Core.Entities;
-using TuttiFruit.Candy.Core.Implementations;
 using TuttiFruit.Candy.Core.Interfaces;
 
 namespace TuttiFruit.Candy.Core.Services
@@ -21,8 +19,8 @@ namespace TuttiFruit.Candy.Core.Services
         private IList<IConsumer> _consumers = new List<IConsumer>();
 
         public BackgroundWorkerService(
-            IOptions<TuttiFruitCandySettings> settings, 
-            IProducerFactory producerFactory, 
+            IOptions<TuttiFruitCandySettings> settings,
+            IProducerFactory producerFactory,
             IConsumerFactory consumerFactory)
         {
             _settings = settings.Value;
@@ -50,14 +48,16 @@ namespace TuttiFruit.Candy.Core.Services
 
         private void Initialize(CancellationToken cancellationToken)
         {
+            for (int i = 0; i < _settings.NumberOfConsumers; i++)
+            {
+                _consumers.Add(_consumerFactory.Create());
+            }
+
             foreach (var producer in _settings.Producers)
             {
-                _producers.Add(_producerFactory.Create(producer, cancellationToken));
+                var subscriber = _settings.Subscribers.First(x => x.Name.Equals(producer.SubscriberManager, StringComparison.Ordinal));
 
-                for (int i = 0; i < producer.NumberOfConsumers; i++)
-                {
-                    _consumers.Add(_consumerFactory.Create(producer.SubscriberType));
-                }
+                _producers.Add(_producerFactory.Create(producer, subscriber.Type, cancellationToken));
             }
         }
     }

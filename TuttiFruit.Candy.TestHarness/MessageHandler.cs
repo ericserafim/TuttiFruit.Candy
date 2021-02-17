@@ -1,18 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using TuttiFruit.Candy.Core.Entities;
 using TuttiFruit.Candy.Core.Interfaces;
 
 namespace TuttiFruit.Candy.TestHarness
 {
     public class MessageHandler : IMessageHandler
     {
-        public Task ProcessMessageAsync(object message)
+        private readonly Func<string, IMqSubscriber> _subscriberGetter;
+
+        public MessageHandler(Func<string, IMqSubscriber> subscriberGetter)
         {
-            Console.WriteLine($"'{message}' has been processed.");
-            return Task.CompletedTask;
+            this._subscriberGetter = subscriberGetter;
+        }
+
+        public async Task ProcessMessageAsync(Message message)
+        {
+            var subscriber = _subscriberGetter(message.SubscriberType);
+            
+            //Simulation
+            Console.WriteLine($"'Message from '{message.SubscriberType}' has been processed.");
+            await Task.Delay(1000);
+
+            await subscriber.SendAckAsync(message.Raw);
         }
     }
 }

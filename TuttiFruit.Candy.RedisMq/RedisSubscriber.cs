@@ -1,8 +1,6 @@
-﻿using StackExchange.Redis;
+﻿using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TuttiFruit.Candy.Core.Entities;
 using TuttiFruit.Candy.Core.Handlers;
@@ -14,6 +12,8 @@ namespace TuttiFruit.Candy.RedisMq
     {
         private readonly ConnectionMultiplexer _connection;
         private readonly ISubscriber _subscriber;
+        private readonly SubscriberSettings _settings;
+        private string _queueName = string.Empty;
 
         public event AsyncEventHandler<SubscriberEventArgs> OnMessage;
 
@@ -22,8 +22,31 @@ namespace TuttiFruit.Candy.RedisMq
             _connection = ConnectionMultiplexer.Connect(connectionSttring);
             _subscriber = _connection.GetSubscriber();
 
+            Console.WriteLine($"{nameof(RedisSubscriber)} has been started.");
+        }
+
+        //public RedisSubscriber(IOptions<SubscriberSettings> settings)
+        //{
+        //    _settings = settings.Value;
+
+        //    _connection = ConnectionMultiplexer.Connect(_settings.ConnectionString);
+        //    _subscriber = _connection.GetSubscriber();
+
+        //    Console.WriteLine($"{nameof(RedisSubscriber)} has been started.");
+        //}
+
+        public Task SendAckAsync(object message)
+        {
+            Console.WriteLine($"{nameof(RedisSubscriber)}.{nameof(SendAckAsync)} to {_queueName}");
+            return Task.CompletedTask;
+        }
+
+        public void SetListenningTo(string queueName)
+        {
+            _queueName = queueName;
+
             _subscriber.Subscribe(
-                new RedisChannel(channelName, RedisChannel.PatternMode.Literal),
+                new RedisChannel(_queueName, RedisChannel.PatternMode.Literal),
                 handler: async (channel, value) =>
                 {
                     if (OnMessage != null)
@@ -32,15 +55,8 @@ namespace TuttiFruit.Candy.RedisMq
                         await Task.CompletedTask;
                 });
 
-            Console.WriteLine($"{nameof(RedisSubscriber)} has been started.");
+            Console.WriteLine($"{nameof(RedisSubscriber)} listenning to {_queueName}.");
         }
-
-        public Task SendAckAsync(object message)
-        {
-            Console.WriteLine($"{nameof(RedisSubscriber)} {nameof(SendAckAsync)}");
-            return Task.CompletedTask;
-        }
-
         public void Dispose()
         {
             _connection?.Close();

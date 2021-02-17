@@ -5,7 +5,6 @@ using System;
 using System.Threading.Channels;
 using TuttiFruit.Candy.Core.Entities;
 using TuttiFruit.Candy.Core.Factories;
-using TuttiFruit.Candy.Core.Implementations;
 using TuttiFruit.Candy.Core.Interfaces;
 using TuttiFruit.Candy.Core.Services;
 
@@ -18,24 +17,18 @@ namespace TuttiFruit.Candy.Core.Extensions
             services.AddOptions(configuration);
 
             services.AddSingleton(sp => new ChannelFactory(sp.GetRequiredService<IOptions<ChannelSettings>>()).CreateChannel());
-            services.AddSingleton(sp => sp.GetRequiredService<Channel<object>>().Writer);
-            services.AddSingleton(sp => sp.GetRequiredService<Channel<object>>().Reader);
+            services.AddSingleton(sp => sp.GetRequiredService<Channel<Message>>().Writer);
+            services.AddSingleton(sp => sp.GetRequiredService<Channel<Message>>().Reader);
 
             services.AddSingleton<IProducerFactory>(sp =>
-                new ProducerFactory(sp.GetRequiredService<ChannelWriter<object>>(), 
-                (typeName) => 
-                {
-                    return (IMqSubscriber)sp.GetRequiredService(Type.GetType($"{typeName}, TuttiFruit.Candy.RedisMq"));
-                }));
+                new ProducerFactory(
+                    sp.GetRequiredService<ChannelWriter<Message>>(),
+                    (typeName) => (IMqSubscriber)sp.GetRequiredService(Type.GetType(typeName))));
 
             services.AddSingleton<IConsumerFactory>(sp =>
-             new ConsumerFactory(sp.GetRequiredService<ChannelReader<object>>(),
-             (typeName) =>
-             {
-                 return (IMqSubscriber)sp.GetRequiredService(Type.GetType($"{typeName}, TuttiFruit.Candy.RedisMq"));
-             },
-             sp.GetRequiredService<IMessageHandler>));
-
+                new ConsumerFactory(
+                    sp.GetRequiredService<ChannelReader<Message>>(),
+                    sp.GetRequiredService<IMessageHandler>));
 
             services.AddHostedService<BackgroundWorkerService>();
         }

@@ -1,9 +1,9 @@
-﻿using TuttiFruit.Candy.Core.Handlers;
-
-namespace TuttiFruit.Candy.Core.Interfaces
+﻿namespace TuttiFruit.Candy.Core.Interfaces
 {
     public interface IProducer
     {
+        void SetQueueNameToSubscriber();
+
         void Stop();
     }
 }

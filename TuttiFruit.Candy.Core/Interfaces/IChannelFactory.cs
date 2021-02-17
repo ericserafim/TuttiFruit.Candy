@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
+﻿using System.Threading.Channels;
+using TuttiFruit.Candy.Core.Entities;
 
 namespace TuttiFruit.Candy.Core.Interfaces
 {
     public interface IChannelFactory
     {
-        Channel<object> CreateChannel();
+        Channel<Message> CreateChannel();
     }
 }

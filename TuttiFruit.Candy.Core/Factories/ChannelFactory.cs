@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 using TuttiFruit.Candy.Core.Entities;
 using TuttiFruit.Candy.Core.Interfaces;
 
@@ -20,7 +15,7 @@ namespace TuttiFruit.Candy.Core.Factories
             _channelSettings = channelSettings.Value;
         }
 
-        public Channel<object> CreateChannel()
+        public Channel<Message> CreateChannel()
         {
             return _channelSettings.Mode switch
             {
@@ -30,7 +25,7 @@ namespace TuttiFruit.Candy.Core.Factories
             };
         }
 
-        private Channel<object> CreateBoundedChannel()
+        private Channel<Message> CreateBoundedChannel()
         {
             var options = new BoundedChannelOptions(_channelSettings.Capacity)
             {
@@ -39,10 +34,10 @@ namespace TuttiFruit.Candy.Core.Factories
                 FullMode = BoundedChannelFullMode.Wait
             };
 
-            return Channel.CreateBounded<object>(options);
+            return Channel.CreateBounded<Message>(options);
         }
 
-        private Channel<object> CreateUnboundedChannel()
+        private Channel<Message> CreateUnboundedChannel()
         {
             var options = new UnboundedChannelOptions
             {
@@ -50,7 +45,7 @@ namespace TuttiFruit.Candy.Core.Factories
                 SingleReader = false
             };
 
-            return Channel.CreateUnbounded<object>(options);
+            return Channel.CreateUnbounded<Message>(options);
         }
     }
 }

@@ -9,31 +9,41 @@ namespace TuttiFruit.Candy.Core.Implementations
 {
     public class Producer : IProducer
     {
-        private readonly string _name;
-        private readonly ChannelWriter<object> _channelWriter;
+        private readonly string _logIdentifier;
+        private readonly ProducerSettings _settings;
+        private readonly ChannelWriter<Message> _channelWriter;
         private readonly IMqSubscriber _subscriber;
         private readonly CancellationToken _cancellationToken;
 
-        public Producer(string name, ChannelWriter<object> channelWriter, IMqSubscriber subscriber, CancellationToken cancellationToken)
+        public Producer(ProducerSettings settings, ChannelWriter<Message> channelWriter, IMqSubscriber subscriber, CancellationToken cancellationToken)
         {
-            _name = name;
+            _settings = settings;
             _channelWriter = channelWriter;
             _subscriber = subscriber;
             _cancellationToken = cancellationToken;
             _subscriber.OnMessage += OnMessageAsync;
 
-            Console.WriteLine($"'{nameof(Producer)}.{_name}' has been started.");
+            _logIdentifier = $"{nameof(Producer)}.{_settings.Name}";
+            Console.WriteLine($"'{_logIdentifier}' has been started.");
+
+            SetQueueNameToSubscriber();
+        }
+
+        public void SetQueueNameToSubscriber()
+        {
+            _subscriber.SetListenningTo(_settings.QueueName);            
         }
 
         public void Stop()
         {
-            _channelWriter.Complete();
-            Console.WriteLine($"{nameof(Producer)}.{_name} closed.");
+            _channelWriter.TryComplete();
+            Console.WriteLine($"{_logIdentifier} closed.");
         }
 
         private async ValueTask OnMessageAsync(object sender, SubscriberEventArgs args)
-        {           
-            await _channelWriter.WriteAsync(args.Message, _cancellationToken);
+        {
+            var message = new Message(_subscriber.GetType().AssemblyQualifiedName, args.Message);
+            await _channelWriter.WriteAsync(message, _cancellationToken);
         }
     }
 }

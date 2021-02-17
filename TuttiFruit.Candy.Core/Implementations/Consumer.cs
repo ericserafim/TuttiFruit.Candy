@@ -2,24 +2,22 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using TuttiFruit.Candy.Core.Entities;
 using TuttiFruit.Candy.Core.Interfaces;
 
 namespace TuttiFruit.Candy.Core.Implementations
 {
     public class Consumer : IConsumer
     {
-        private readonly ChannelReader<object> _channelReader;
-        private readonly IMqSubscriber _subscriber;
+        private readonly ChannelReader<Message> _channelReader;        
         private readonly IMessageHandler _messageHandler;
         private readonly Guid _id = Guid.NewGuid();
 
         public Consumer(
-            ChannelReader<object> channelReader, 
-            IMqSubscriber subscriber,
+            ChannelReader<Message> channelReader,            
             IMessageHandler messageHandler)
         {
-            _channelReader = channelReader;
-            _subscriber = subscriber;
+            _channelReader = channelReader;            
             _messageHandler = messageHandler;
         }
 
@@ -29,10 +27,8 @@ namespace TuttiFruit.Candy.Core.Implementations
 
             await foreach (var message in _channelReader.ReadAllAsync(cancellationToken))
             {
-                Console.WriteLine($"{nameof(Consumer)}:{_id} => '{message}' received.");
-
-                await _messageHandler.ProcessMessageAsync(message);
-                await _subscriber.SendAckAsync(message);
+                Console.WriteLine($"{nameof(Consumer)}:{_id} => '{message.Raw}' received.");
+                await _messageHandler.ProcessMessageAsync(message);                
             }
         }
     }
