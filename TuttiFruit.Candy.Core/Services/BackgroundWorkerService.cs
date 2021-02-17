@@ -17,11 +17,11 @@ namespace TuttiFruit.Candy.Core.Services
         private readonly TuttiFruitCandySettings _settings;
         private readonly IProducerFactory _producerFactory;
         private readonly IConsumerFactory _consumerFactory;
-        private IEnumerable<IProducer> _producers;
-        private IEnumerable<IConsumer> _consumers;
+        private IList<IProducer> _producers = new List<IProducer>();
+        private IList<IConsumer> _consumers = new List<IConsumer>();
 
         public BackgroundWorkerService(
-            IOptionsSnapshot<TuttiFruitCandySettings> settings, 
+            IOptions<TuttiFruitCandySettings> settings, 
             IProducerFactory producerFactory, 
             IConsumerFactory consumerFactory)
         {
@@ -33,7 +33,9 @@ namespace TuttiFruit.Candy.Core.Services
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             Initialize(cancellationToken);
-            await Task.WhenAll(_consumers.Select(c => c.StartConsumeAsync(cancellationToken)));
+            var consumersTasks = _consumers.Select(c => c.StartConsumeAsync(cancellationToken));
+
+            await Task.WhenAll(consumersTasks);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
@@ -50,11 +52,11 @@ namespace TuttiFruit.Candy.Core.Services
         {
             foreach (var producer in _settings.Producers)
             {
-                _producers.Append(_producerFactory.Create(producer, cancellationToken));
+                _producers.Add(_producerFactory.Create(producer, cancellationToken));
 
                 for (int i = 0; i < producer.NumberOfConsumers; i++)
                 {
-                    _consumers.Append(_consumerFactory.Create(producer.SubscriberType));
+                    _consumers.Add(_consumerFactory.Create(producer.SubscriberType));
                 }
             }
         }

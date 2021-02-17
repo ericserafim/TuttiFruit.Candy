@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -14,9 +15,9 @@ namespace TuttiFruit.Candy.Core.Factories
     {
         private readonly ChannelSettings _channelSettings;
 
-        public ChannelFactory(ChannelSettings channelSettings)
+        public ChannelFactory(IOptions<ChannelSettings> channelSettings)
         {
-            _channelSettings = channelSettings;
+            _channelSettings = channelSettings.Value;
         }
 
         public Channel<object> CreateChannel()

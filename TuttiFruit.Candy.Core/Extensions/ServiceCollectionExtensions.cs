@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Channels;
 using TuttiFruit.Candy.Core.Entities;
@@ -16,7 +17,7 @@ namespace TuttiFruit.Candy.Core.Extensions
         {
             services.AddOptions(configuration);
 
-            services.AddSingleton(sp => new ChannelFactory(sp.GetRequiredService<ChannelSettings>()).CreateChannel());
+            services.AddSingleton(sp => new ChannelFactory(sp.GetRequiredService<IOptions<ChannelSettings>>()).CreateChannel());
             services.AddSingleton(sp => sp.GetRequiredService<Channel<object>>().Writer);
             services.AddSingleton(sp => sp.GetRequiredService<Channel<object>>().Reader);
 
@@ -24,14 +25,14 @@ namespace TuttiFruit.Candy.Core.Extensions
                 new ProducerFactory(sp.GetRequiredService<ChannelWriter<object>>(), 
                 (typeName) => 
                 {
-                    return (IMqSubscriber)sp.GetRequiredService(Type.GetType(typeName));
+                    return (IMqSubscriber)sp.GetRequiredService(Type.GetType($"{typeName}, TuttiFruit.Candy.RedisMq"));
                 }));
 
             services.AddSingleton<IConsumerFactory>(sp =>
              new ConsumerFactory(sp.GetRequiredService<ChannelReader<object>>(),
              (typeName) =>
              {
-                 return (IMqSubscriber)sp.GetRequiredService(Type.GetType(typeName));
+                 return (IMqSubscriber)sp.GetRequiredService(Type.GetType($"{typeName}, TuttiFruit.Candy.RedisMq"));
              },
              sp.GetRequiredService<IMessageHandler>));
 

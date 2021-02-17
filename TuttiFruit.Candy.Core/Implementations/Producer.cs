@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using TuttiFruit.Candy.Core.Entities;
@@ -20,15 +21,18 @@ namespace TuttiFruit.Candy.Core.Implementations
             _subscriber = subscriber;
             _cancellationToken = cancellationToken;
             _subscriber.OnMessage += OnMessageAsync;
+
+            Console.WriteLine($"'{nameof(Producer)}.{_name}' has been started.");
         }
 
         public void Stop()
         {
             _channelWriter.Complete();
+            Console.WriteLine($"{nameof(Producer)}.{_name} closed.");
         }
 
         private async ValueTask OnMessageAsync(object sender, SubscriberEventArgs args)
-        {
+        {           
             await _channelWriter.WriteAsync(args.Message, _cancellationToken);
         }
     }

@@ -8,7 +8,7 @@ using TuttiFruit.Candy.Core.Handlers;
 
 namespace TuttiFruit.Candy.Core.Interfaces
 {
-    public interface IMqSubscriber
+    public interface IMqSubscriber : IDisposable
     {
         event AsyncEventHandler<SubscriberEventArgs> OnMessage;
 

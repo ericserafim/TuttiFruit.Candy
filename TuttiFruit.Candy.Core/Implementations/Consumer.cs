@@ -11,6 +11,7 @@ namespace TuttiFruit.Candy.Core.Implementations
         private readonly ChannelReader<object> _channelReader;
         private readonly IMqSubscriber _subscriber;
         private readonly IMessageHandler _messageHandler;
+        private readonly Guid _id = Guid.NewGuid();
 
         public Consumer(
             ChannelReader<object> channelReader, 
@@ -24,8 +25,12 @@ namespace TuttiFruit.Candy.Core.Implementations
 
         public async Task StartConsumeAsync(CancellationToken cancellationToken)
         {
+            Console.WriteLine($"{nameof(Consumer)}:{_id} has been started.");
+
             await foreach (var message in _channelReader.ReadAllAsync(cancellationToken))
             {
+                Console.WriteLine($"{nameof(Consumer)}:{_id} => '{message}' received.");
+
                 await _messageHandler.ProcessMessageAsync(message);
                 await _subscriber.SendAckAsync(message);
             }
