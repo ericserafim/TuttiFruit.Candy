@@ -5,9 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TuttiFruit.Candy.Core\TuttiFruit.Candy.Core.csproj" />
-    <ProjectReference Include="..\TuttiFruit.Candy.RabbitMq\TuttiFruit.Candy.RabbitMq.csproj" />
-    <ProjectReference Include="..\TuttiFruit.Candy.RedisMq\TuttiFruit.Candy.RedisMq.csproj" />
+    <ProjectReference Include="..\TuttiFruit.Candy.Rabbit\TuttiFruit.Candy.Rabbit.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
