@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace TuttiFruit.Candy.Rabbit.Entities
 {
-    public class SubscriberEventArgs : EventArgs
+    public class ConnectionEventArgs : EventArgs
     {
-        public Message Message { get; }
+        public Exception Exception { get; }
 
-        public SubscriberEventArgs(Message message)
+        public ConnectionEventArgs(Exception exception)
         {
-            Message = message;
+            Exception = exception;
         }
+
     }
 }
