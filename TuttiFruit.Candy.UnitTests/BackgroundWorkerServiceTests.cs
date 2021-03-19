@@ -95,7 +95,7 @@ namespace TuttiFruit.Candy.UnitTests
             _subscriberMock.Raise(x => x.OnConnectionError += null, new ConnectionEventArgs(new Exception()));
 
             //Assert
-            _producerMock.Verify(x => x.Stop(), Times.Once);
+            _producerMock.Verify(x => x.Complete(), Times.Once);
         }
     }
 }

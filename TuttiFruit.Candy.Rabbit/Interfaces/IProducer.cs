@@ -12,6 +12,6 @@ namespace TuttiFruit.Candy.Rabbit.Interfaces
     {
         Task PublishMessageAsync(Message message, CancellationToken cancellationToken);
 
-        void Stop();
+        void Complete();
     }
 }

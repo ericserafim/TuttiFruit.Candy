@@ -13,7 +13,7 @@ namespace TuttiFruit.Candy.Rabbit.Services
         private readonly IMQSubscriber _subscriber;
         private readonly IProducer _producer;
         private readonly IConsumerFactory _consumerFactory;
-        private CancellationToken _stoppingtoken = default;
+        private CancellationToken _cancellationToken = default;
 
         public BackgroundWorkerService(IMQSubscriber subscriber, IProducer producer, IConsumerFactory consumerFactory)
         {
@@ -28,22 +28,22 @@ namespace TuttiFruit.Candy.Rabbit.Services
         private async ValueTask OnConnectionError(object sender, ConnectionEventArgs args)
         {
             _subscriber.Dispose();
-            _producer.Stop();
+            _producer.Complete();
 
             await Task.CompletedTask;
         }
 
         private async ValueTask OnMessage(object sender, SubscriberEventArgs args)
         {
-            await _producer.PublishMessageAsync(args.Message, _stoppingtoken);
+            await _producer.PublishMessageAsync(args.Message, _cancellationToken);
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            _stoppingtoken = stoppingToken;
-            var consumerTasks = _consumerFactory.CreateConsumers().Select(c => c.StartConsumeAsync(stoppingToken));
+            _cancellationToken = cancellationToken;
+            var consumerTasks = _consumerFactory.CreateConsumers().Select(c => c.StartConsumeAsync(cancellationToken));
             
-            await _subscriber.StartAsync(stoppingToken);
+            await _subscriber.StartAsync(cancellationToken);
             await Task.WhenAll(consumerTasks);
         }
     }

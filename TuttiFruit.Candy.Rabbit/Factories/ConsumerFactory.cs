@@ -34,7 +34,7 @@ namespace TuttiFruit.Candy.Rabbit.Factories
         {
             for (int i = 0; i < _settings.NumberOfConsumers; i++)
             {
-                yield return new Consumer();
+                yield return new Consumer(_channelReader, _mQSubscriber, _messageHandlerGetter());
             }
         }
     }

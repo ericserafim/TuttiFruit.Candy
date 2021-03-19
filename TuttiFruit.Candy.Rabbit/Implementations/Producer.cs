@@ -18,14 +18,14 @@ namespace TuttiFruit.Candy.Rabbit.Implementations
             _logger = logger;
         }
 
-        public Task PublishMessageAsync(Message message, CancellationToken cancellationToken)
+        public async Task PublishMessageAsync(Message message, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            await _channelWriter.WriteAsync(message, cancellationToken);
         }
 
-        public void Stop()
+        public void Complete()
         {
-            _channelWriter.Complete();
+            _channelWriter.TryComplete();
             _logger.LogDebug($"{nameof(Producer)} has been closed.");
         }
     }

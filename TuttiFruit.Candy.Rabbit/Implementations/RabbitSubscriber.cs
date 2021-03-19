@@ -20,16 +20,16 @@ namespace TuttiFruit.Candy.Rabbit.Implementations
         {
             _rabbitSettings = rabbitSettings;
         }
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task SendAckAsync(Message message)
         {
             throw new NotImplementedException();
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
 
         public void Dispose()
         {
