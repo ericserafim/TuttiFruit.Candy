@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,19 +11,39 @@ namespace TuttiFruit.Candy.Rabbit.Implementations
 {
     public class RabbitSubscriber : IMQSubscriber
     {
-        private readonly IOptions<RabbitSettings> _rabbitSettings;
+        private readonly RabbitSettings _rabbitSettings;
+
+        private IConnection _connection;
 
         public event AsyncEventHandler<SubscriberEventArgs> OnMessage;
 
         public event AsyncEventHandler<ConnectionEventArgs> OnConnectionError;
+        
 
         public RabbitSubscriber(IOptions<RabbitSettings> rabbitSettings)
         {
-            _rabbitSettings = rabbitSettings;
+            _rabbitSettings = rabbitSettings.Value;
         }
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var factory = new ConnectionFactory();
+                
+                factory.UserName = _rabbitSettings.UserName;
+                factory.Password = _rabbitSettings.Password;
+                factory.VirtualHost = _rabbitSettings.VirtualHost;
+                factory.HostName = _rabbitSettings.HostName;
+                factory.Port = _rabbitSettings.Port;                
+
+                _connection = factory.CreateConnection();
+
+                await Task.CompletedTask;
+            }
+            catch (Exception e)
+            {
+                OnConnectionError?.Invoke(this, new ConnectionEventArgs(e));
+            }
         }
 
         public Task SendAckAsync(Message message)

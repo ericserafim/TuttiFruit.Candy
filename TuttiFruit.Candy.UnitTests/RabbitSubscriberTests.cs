@@ -15,34 +15,25 @@ namespace TuttiFruit.Candy.UnitTests
     public class RabbitSubscriberTests
     {
         [Fact]
-        public void StartAsync_WhenSettingsAreValid_ShouldNotThrowException()
+        public async Task StartAsync_WhenSettingsIsInvalid_ShouldRaiseOnConnectionEventAsync()
         {
             //Arrange
+            var eventTrigged = false;
             var settings = Options.Create(new RabbitSettings());
             var sut = new RabbitSubscriber(settings);
 
+            sut.OnConnectionError += async (sender, @event) =>
+            {
+                eventTrigged = true;
+                await Task.CompletedTask;
+            };
+
             //Act
-            Func<Task> actionResult = async () => await sut.StartAsync(default);
+            await sut.StartAsync(default);
 
 
             //Assert
-            actionResult.Should().NotThrow();
-        }
-
-        [Fact]
-        public void SendAckAsync_WhenSettingsAreValid_ShouldNotThrowException()
-        {
-            //Arrange
-            var message = new Fixture().Create<Message>();
-            var settings = Options.Create(new RabbitSettings());
-            var sut = new RabbitSubscriber(settings);
-
-            //Act
-            Func<Task> actionResult = async () => await sut.SendAckAsync(message);
-
-
-            //Assert
-            actionResult.Should().NotThrow();
+            eventTrigged.Should().BeTrue();
         }
     }
 }
