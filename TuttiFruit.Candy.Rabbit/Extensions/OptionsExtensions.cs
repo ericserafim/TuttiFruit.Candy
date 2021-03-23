@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TuttiFruit.Candy.Rabbit.Entities;
 
-namespace TuttiFruit.Candy.Rabbit.Entensions
+namespace TuttiFruit.Candy.Rabbit.Extensions
 {
     public static class OptionsExtensions
     {

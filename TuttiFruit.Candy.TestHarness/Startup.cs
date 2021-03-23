@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TuttiFruit.Candy.Rabbit.Entensions;
+using TuttiFruit.Candy.Rabbit.Extensions;
 
 namespace TuttiFruit.Candy.TestHarness
 {

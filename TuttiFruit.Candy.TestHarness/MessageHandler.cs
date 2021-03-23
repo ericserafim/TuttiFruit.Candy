@@ -9,7 +9,8 @@ namespace TuttiFruit.Candy.TestHarness
     {             
         public async Task ProcessMessageAsync(Message message)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Message has been received {message.Raw}");
+            await Task.CompletedTask;
         }
     }
 }

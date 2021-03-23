@@ -13,7 +13,7 @@ using TuttiFruit.Candy.Rabbit.Implementations;
 using TuttiFruit.Candy.Rabbit.Interfaces;
 using TuttiFruit.Candy.Rabbit.Services;
 
-namespace TuttiFruit.Candy.Rabbit.Entensions
+namespace TuttiFruit.Candy.Rabbit.Extensions
 {
     public static class ServiceCollectionExtensions
     {
