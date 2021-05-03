@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TuttiFruit.Candy.Rabbit.Entities
+﻿namespace TuttiFruit.Candy.Rabbit.Entities
 {
-    public struct Message
-    {
-        public object Raw { get; private set; }
+  public struct Message
+  {
+    public ulong DeliveryTag { get; private set; }
 
-        public Message(object raw)
-        {            
-            Raw = raw;
-        }
+    public object Raw { get; private set; }
+
+    public Message(object raw, ulong deliveryTag)
+    {
+      DeliveryTag = deliveryTag;
+      Raw = raw;
     }
+  }
 }

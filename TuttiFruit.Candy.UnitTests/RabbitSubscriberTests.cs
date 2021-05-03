@@ -1,10 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TuttiFruit.Candy.Rabbit.Entities;
 using TuttiFruit.Candy.Rabbit.Implementations;
@@ -12,28 +7,28 @@ using Xunit;
 
 namespace TuttiFruit.Candy.UnitTests
 {
-    public class RabbitSubscriberTests
+  public class RabbitSubscriberTests
+  {
+    [Fact]
+    public async Task StartAsync_WhenSettingsIsInvalid_ShouldRaiseOnConnectionEventAsync()
     {
-        [Fact]
-        public async Task StartAsync_WhenSettingsIsInvalid_ShouldRaiseOnConnectionEventAsync()
-        {
-            //Arrange
-            var eventTrigged = false;
-            var settings = Options.Create(new RabbitSettings());
-            var sut = new RabbitSubscriber(settings);
+      //Arrange
+      var eventTrigged = false;
+      var settings = Options.Create(new RabbitSettings());
+      var sut = new RabbitSubscriber(settings);
 
-            sut.OnConnectionError += async (sender, @event) =>
-            {
-                eventTrigged = true;
-                await Task.CompletedTask;
-            };
+      sut.OnConnectionError += async (sender, @event) =>
+      {
+        eventTrigged = true;
+        await Task.CompletedTask;
+      };
 
-            //Act
-            await sut.StartAsync(default);
+      //Act
+      await sut.StartAsync(default);
 
 
-            //Assert
-            eventTrigged.Should().BeTrue();
-        }
+      //Assert
+      eventTrigged.Should().BeTrue();
     }
+  }
 }
